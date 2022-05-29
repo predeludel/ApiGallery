@@ -8,16 +8,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Image {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer width;
-    private Integer height;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "file_id", referencedColumnName = "id")
-    private File file;
-
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
+    private User user;
+    private String name;
+    private String attachFilePath;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "base_id", referencedColumnName = "id")

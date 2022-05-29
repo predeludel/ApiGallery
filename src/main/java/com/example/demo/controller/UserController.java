@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -16,6 +17,16 @@ public class UserController {
     @GetMapping
     public Iterable<User> read() {
         return userService.getAllUsers();
+    }
+
+    @GetMapping("/{page}/{size}")
+    public Page<User> read(@PathVariable Integer page, @PathVariable Integer size) {
+        return userService.getAllUsersPage(page, size);
+    }
+
+    @GetMapping("/{page}/{size}/sort/{field}")
+    public Page<User> read(@PathVariable Integer page, @PathVariable Integer size, @PathVariable String field) {
+        return userService.getAllUsersPageSortByField(page, size, field);
     }
 
     @PostMapping
