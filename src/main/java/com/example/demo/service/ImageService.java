@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.Base;
 import com.example.demo.model.Image;
+import com.example.demo.model.User;
 import com.example.demo.model.UserFavoriteImage;
 import com.example.demo.repo.BaseRepository;
 import com.example.demo.repo.ImageRepository;
@@ -32,9 +33,7 @@ public class ImageService {
 
     protected static final String IMAGE_FILE_NAME_FORMAT = "%d.png";
 
-    public Iterable<Image> getAllImages() {
-        return imageRepository.findAll();
-    }
+
 
     public Page<Image> getAllImagesPage(int page, int size) {
         return imageRepository.findAll(PageRequest.of(page, size));
@@ -45,8 +44,11 @@ public class ImageService {
     }
 
 
-    public Image attachFile(Long id, MultipartFile file) {
+    public Image attachFile(Long id, MultipartFile file, User user) {
         Image image = getImageById(id);
+        if ( !image.getUser().getId().equals(user.getId())){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED");
+        }
         try {
             String path = fileService.saveFile(file.getBytes(), String.format(IMAGE_FILE_NAME_FORMAT, image.getId()));
             image.setAttachFilePath(path);
@@ -55,6 +57,7 @@ public class ImageService {
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
+
         return image;
     }
 
@@ -66,9 +69,12 @@ public class ImageService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Image with id %d not found", id));
         }
     }
+    public Iterable<Image> getAllImages() {
+        return imageRepository.findAll();
+    }
 
-    public boolean deleteImage(Long id) {
-        if (imageRepository.existsById(id)) {
+    public boolean deleteImage(Long id, User user) {
+        if (imageRepository.existsById(id) && imageRepository.findById(id).get().getUser().getId().equals(user.getId())) {
             imageRepository.deleteById(id);
             return true;
         } else {
@@ -76,7 +82,7 @@ public class ImageService {
         }
     }
 
-    public Image saveImage(Image image) {
+    public Image saveImage(Image image, User user) {
         if (image.getId() != null && imageRepository.findById(image.getId()).isPresent()) {
             Image oldImage = imageRepository.findById(image.getId()).get();
             image.setBase(oldImage.getBase());
@@ -86,6 +92,7 @@ public class ImageService {
             base = baseRepository.save(base);
             image.setBase(base);
         }
+        image.setUser(user);
         return imageRepository.save(image);
     }
 

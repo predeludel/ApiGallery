@@ -14,29 +14,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public Iterable<User> read() {
-        return userService.getAllUsers();
-    }
-
-    @GetMapping("/{page}/{size}")
-    public Page<User> read(@PathVariable Integer page, @PathVariable Integer size) {
-        return userService.getAllUsersPage(page, size);
-    }
-
-    @GetMapping("/{page}/{size}/sort/{field}")
-    public Page<User> read(@PathVariable Integer page, @PathVariable Integer size, @PathVariable String field) {
-        return userService.getAllUsersPageSortByField(page, size, field);
-    }
-
     @PostMapping
     public User save(@RequestBody User user) {
         return userService.saveUser(user);
-    }
-
-    @DeleteMapping("/{id}")
-    public Boolean delete(@PathVariable Long id) {
-        return userService.deleteUser(id);
     }
 
 }

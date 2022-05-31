@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Image;
 import com.example.demo.model.User;
+import com.example.demo.service.AuthenticationService;
 import com.example.demo.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -16,6 +17,8 @@ public class ImageController {
 
     @Autowired
     private ImageService imageService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @GetMapping
     public Iterable<Image> read() {
@@ -28,18 +31,18 @@ public class ImageController {
     }
 
     @PostMapping
-    public Image save(@RequestBody Image image) {
-        return imageService.saveImage(image);
+    public Image save(@RequestBody Image image,@RequestHeader("token") String token) {
+        return imageService.saveImage(image, authenticationService.validate(token));
     }
 
     @PostMapping("/{id}/attach")
-    public Image attachFile(@PathVariable Long id, @RequestBody MultipartFile file) {
-        return imageService.attachFile(id, file);
+    public Image attachFile(@PathVariable Long id, @RequestBody MultipartFile file,@RequestHeader("token") String token) {
+        return imageService.attachFile(id, file, authenticationService.validate(token));
     }
 
     @DeleteMapping("/{id}")
-    public Boolean delete(@PathVariable Long id) {
-        return imageService.deleteImage(id);
+    public Boolean delete(@PathVariable Long id,@RequestHeader("token") String token) {
+        return imageService.deleteImage(id,authenticationService.validate(token));
     }
 
     @GetMapping("/{page}/{size}")

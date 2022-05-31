@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.User;
 import com.example.demo.model.UserFavoriteImage;
+import com.example.demo.service.AuthenticationService;
 import com.example.demo.service.UserFavoriteImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,8 @@ public class UserFavoriteImageController {
 
     @Autowired
     private UserFavoriteImageService userFavoriteImageService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @GetMapping
     public Iterable<UserFavoriteImage> read() {
@@ -20,13 +23,13 @@ public class UserFavoriteImageController {
     }
 
     @PostMapping
-    public UserFavoriteImage save(@RequestBody UserFavoriteImage userFavoriteImage) {
-        return userFavoriteImageService.saveUserFavoriteImage(userFavoriteImage);
+    public UserFavoriteImage save(@RequestBody UserFavoriteImage userFavoriteImage,@RequestHeader("token") String token) {
+        return userFavoriteImageService.saveUserFavoriteImage(userFavoriteImage, authenticationService.validate(token));
     }
 
     @DeleteMapping("/{id}")
-    public Boolean delete(@PathVariable Long id) {
-        return userFavoriteImageService.deleteUserFavoriteImage(id);
+    public Boolean delete(@PathVariable Long id,@RequestHeader("token") String token) {
+        return userFavoriteImageService.deleteUserFavoriteImage(id, authenticationService.validate(token));
     }
 
     @GetMapping("/{page}/{size}")

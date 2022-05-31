@@ -34,8 +34,8 @@ public class UserFavoriteImageService {
         return userFavoriteImageRepository.findAll();
     }
 
-    public boolean deleteUserFavoriteImage(Long id) {
-        if (userFavoriteImageRepository.existsById(id)) {
+    public boolean deleteUserFavoriteImage(Long id, User user) {
+        if (userFavoriteImageRepository.existsById(id) && userFavoriteImageRepository.findById(id).get().getUser().getId().equals(user.getId())) {
             userFavoriteImageRepository.deleteById(id);
             return true;
         } else {
@@ -43,7 +43,7 @@ public class UserFavoriteImageService {
         }
     }
 
-    public UserFavoriteImage saveUserFavoriteImage(UserFavoriteImage userFavoriteImage) {
+    public UserFavoriteImage saveUserFavoriteImage(UserFavoriteImage userFavoriteImage, User user) {
         if (userFavoriteImage.getId() != null && userFavoriteImageRepository.findById(userFavoriteImage.getId()).isPresent()) {
             UserFavoriteImage oldUserFavoriteImage = userFavoriteImageRepository.findById(userFavoriteImage.getId()).get();
             userFavoriteImage.setBase(oldUserFavoriteImage.getBase());
@@ -53,6 +53,7 @@ public class UserFavoriteImageService {
             base = baseRepository.save(base);
             userFavoriteImage.setBase(base);
         }
+        userFavoriteImage.setUser(user);
         return userFavoriteImageRepository.save(userFavoriteImage);
 
     }
